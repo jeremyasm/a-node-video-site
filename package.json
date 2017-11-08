@@ -1,0 +1,27 @@
+{
+  "name": "a-node-video-site",
+  "version": "1.0.0",
+  "description": "A simple video site based on NodeJS",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [
+    "Video Upload",
+    "Video Stream",
+    "Video Play",
+    "Node JS",
+    "Express JS"
+  ],
+  "author": "liyaoxing1991@126.com",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.15.3",
+    "ffmpeg": "0.0.4",
+    "fluent-ffmpeg": "^2.1.2",
+    "is-video": "^1.0.1",
+    "multer": "^1.3.0",
+    "video-stitch": "^1.4.0"
+  }
+}
