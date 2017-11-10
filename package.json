@@ -14,7 +14,7 @@
     "Node JS",
     "Express JS"
   ],
-  "author": "liyaoxing1991@126.com",
+  "author": "jeremyasm",
   "license": "MIT",
   "dependencies": {
     "express": "^4.15.3",

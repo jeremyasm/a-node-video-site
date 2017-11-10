@@ -34,38 +34,18 @@ module.exports.renderVideo = function(req, res) {
   if(!fileDetails) {
     return res.send('INVALID FILE ID')
   }
-  const storedFileName = fileDetails.path.split('/')[1];
+  // const storedFileName = fileDetails.path.split('/')[1]; // for Unix/Linux
+  const storedFileName = fileDetails.path.split('\\')[1]; // for Windows
   const videoDetails = fileDetails.details || 'NA';
   const videoName = fileDetails.name;
   console.log("storedFileName: " + storedFileName);
   console.log("videoName: " + videoName);
-  // const index_file = `
-  // <html>
-  //   <title>Sample Video Stream</title>
-  //   <body>
-  //       <video width="320" height="240" controls>
-  //           <source src="/video/`+ storedFileName +`/play" type="video/mp4"/>
-  //           Your browser does not support the <code>video</code> element.
-  //       </video>
-  //       <br>
-  //       <div>
-  //         <strong>Video Details: </strong>
-  //         `+ videoDetails + `
-  //       </div>
-  //       <div>
-  //         <strong>Video Name: </strong>
-  //         `+ videoName + `
-  //       </div>
-  //   </body>
-  // </html>`;
-
-  // var videoLocation = path.resolve(process.env.FILE_UPLOAD_PATH, req.params.id + "-" + videoName);
   const index_file = `
   <html>
     <title>Sample Video Stream</title>
     <body>
         <video width="320" height="240" controls>
-            <source src="/video/`+ req.params.id + "-" + videoName +`/play" type="video/mp4"/>
+            <source src="/video/`+ storedFileName +`/play" type="video/mp4"/>
             Your browser does not support the <code>video</code> element.
         </video>
         <br>
@@ -79,6 +59,10 @@ module.exports.renderVideo = function(req, res) {
         </div>
     </body>
   </html>`;
+
+  // bak: 
+  // <source src="/video/`+ req.params.id + "-" + videoName +`/play" type="video/mp4"/>
+
   res.send(index_file);
 
 }
