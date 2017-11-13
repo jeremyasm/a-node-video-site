@@ -10,4 +10,6 @@ router.get('/:inputFileName/byFrames', videoClipController.clipByFrames);
 
 router.get('/:inputFileName/frames', videoClipController.getFrames);
 
+router.get('/:fileName/process', videoClipController.initProcessPage);
+
 module.exports = router;

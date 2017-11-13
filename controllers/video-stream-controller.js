@@ -29,6 +29,7 @@ function streamVideoFile(req, res, video_file){
 
 }
 
+// GET /:id
 module.exports.renderVideo = function(req, res) {
   const fileDetails = handleDb.getFile(req.params.id);
   if(!fileDetails) {
@@ -44,7 +45,7 @@ module.exports.renderVideo = function(req, res) {
   <html>
     <title>Sample Video Stream</title>
     <body>
-        <video width="320" height="240" controls>
+        <video width="640" height="480" controls>
             <source src="/video/`+ storedFileName +`/play" type="video/mp4"/>
             Your browser does not support the <code>video</code> element.
         </video>
@@ -57,16 +58,21 @@ module.exports.renderVideo = function(req, res) {
           <strong>Video Name: </strong>
           `+ videoName + `
         </div>
+        <hr />
+        <div>
+          Please <a href=/clip/` + storedFileName + `/process>click here</a> to get the highlights of the video.
+        </div>
     </body>
   </html>`;
 
-  // bak: 
+  // bak:
   // <source src="/video/`+ req.params.id + "-" + videoName +`/play" type="video/mp4"/>
 
   res.send(index_file);
 
 }
 
+// GET /:file_name/play
 module.exports.streamVideo = function(req, res) {
 
   const file_name = req.params.file_name;
