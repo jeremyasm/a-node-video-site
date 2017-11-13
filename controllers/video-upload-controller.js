@@ -3,10 +3,12 @@ const fileUploadConfig = require('../config/file-upload-config').fileUploadConfi
 const handleDb = require('../db/handle-db');
 const multer  = require('multer');
 
+// GET /
 module.exports.initUploadPage = function(req, res) {
   res.sendFile(path.resolve(__dirname + '/../public/video_upload_test.html'));
 }
 
+// POST /
 module.exports.uploadFile = function(req, res) {
   var upload = multer(fileUploadConfig).single('user-file');
   upload(req, res, function(uploadError){

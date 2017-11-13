@@ -4,6 +4,10 @@ var videoClipController = require('../controllers/video-clip-controller');
 
 router.get('/helloworld', videoClipController.helloWorld);
 
-router.get('/:inputFileName', videoClipController.clip);
+router.get('/:inputFileName/byTime', videoClipController.clipByTime);
+
+router.get('/:inputFileName/byFrames', videoClipController.clipByFrames);
+
+router.get('/:inputFileName/frames', videoClipController.getFrames);
 
 module.exports = router;
