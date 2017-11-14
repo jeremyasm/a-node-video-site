@@ -59,8 +59,9 @@ module.exports.renderVideo = function(req, res) {
           `+ videoName + `
         </div>
         <hr />
+        <h1></h1>
         <div>
-          Please <a href=/clip/` + storedFileName + `/process>click here</a> to get the highlights of the video.
+          Please <a href=/clip/` + storedFileName + `/select>click here</a> to get the highlights of the video.
         </div>
     </body>
   </html>`;

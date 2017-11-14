@@ -1,0 +1,40 @@
+<html>
+<head>
+  <script>
+  function posthighlightsType(){
+    var pathname = window.location.pathname; // /clip/1510644534276-battle_rope.mp4/select
+    var fileName = pathname.match(/clip\/(\S*)\/select/)[1]; // 1510644534276-battle_rope.mp4
+    var form = document.getElementById('selectForm');
+    form.action = "/clip/" + fileName + "/highlights";
+  }
+  </script>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<h1>Process Page</h1>
+<div>
+  Please choose the type of highlights:
+  <h3></h3>
+  <form name="selectForm" id="selectForm" >
+    <input type="radio" name="highlightsType" value="get" id="get" />
+    <label for="get">抢险救球 (get)</label>
+    <br />
+    <input type="radio" name="highlightsType" value="intercept" id="intercept" />
+    <label for="intercept">截击 (intercept)</label>
+    <br />
+    <input type="radio" name="highlightsType" value="double_hit" id="double_hit" />
+    <label for="double_hit">连击 (double hit)</label>
+    <br />
+    <input type="radio" name="highlightsType" value="kill" checked id="kill" />
+    <label for="kill">扣杀 (kill)</label>
+    <br />
+    <input type="radio" name="highlightsType" value="round_the_head_stroke" id="round_the_head_stroke" />
+    <label for="round_the_head_stroke">绕头顶扣杀 (round the head stroke)</label>
+    <br />
+    <input type="radio" name="highlightsType" value="finishing_shot" id="finishing_shot" />
+    <label for="finishing_shot">决定得分的一击 (finishing shot)</label>
+    <br><br>
+    <input type="submit" value="Submit" onclick="posthighlightsType();">
+  </form>
+</div>
+
+</html>

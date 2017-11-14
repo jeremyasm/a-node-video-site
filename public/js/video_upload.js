@@ -1,4 +1,3 @@
-
 function onSubmit(e) {
   e.preventDefault();
   var customMessage = document.getElementById('message');

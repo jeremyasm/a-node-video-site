@@ -161,32 +161,20 @@ module.exports.getFrames = function(req, res, err) {
   });
 }
 
-module.exports.process = function(req, res, err) {
-
-  var inputFileName = req.params.inputFileName;
-  ffmpeg.ffprobe(path.resolve(process.env.VIDEO_INPUT_PATH, inputFileName), function(err, metadata) {
-    if (err) console.log(err);
-    var videoStreamObj = metadata.streams[0].codec_type === "video" ? metadata.streams[0] : metadata.streams[1];
-    var originRFrameRateStr = videoStreamObj.r_frame_rate;
-    var originRFrameRate = originRFrameRateStr.split('/')[0] / originRFrameRateStr.split('/')[1];
-    var originAvgFrameRateStr = videoStreamObj.avg_frame_rate;
-    var originAvgFrameRate =  originAvgFrameRateStr.split('/')[0] / originAvgFrameRateStr.split('/')[1];
-    var originFrames = videoStreamObj.nb_frames;
-    console.log(metadata);
-    console.log("r_frame_rate: " + originRFrameRateStr + " => " + originRFrameRate);
-    console.log("avg_frame_rate: " + originAvgFrameRateStr + " => " + originAvgFrameRate);
-    console.log("nb_frames: " + originFrames);
-    res.status(200).json({
-      "nb_frames" : originFrames
-    }); // res.json end
-  });
+// GET /select
+module.exports.initSelectPage = function(req, res, err) {
+  var fileName = req.params.fileName;
+  res.sendFile(path.resolve(__dirname + '/../public/select_highlights_type.html'));
 }
 
-
-// GET /process
-module.exports.initProcessPage = function(req, res) {
+// GET /:fileName/highlights?highlightsType=xxx
+module.exports.getHighlightsFromVideo =  function(req, res, err) {
   var fileName = req.params.fileName;
-  console.log("fileName: " + fileName);
-  // TODO 
-  res.sendFile(path.resolve(__dirname + '/../public/processPage.html'));
+  var highlightsType = req.query.highlightsType;
+  // TODO
+  // process video and get specific type of highlights
+  res.json({
+    "fileName" : fileName,
+    "highlightsType" : highlightsType
+  });
 }
