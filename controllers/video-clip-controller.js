@@ -1,7 +1,9 @@
 const path = require('path');
 var fs = require("fs");
 var ffmpeg = require('fluent-ffmpeg');
+var logger = require('log4js').getLogger('video-clip-controller');
 
+// GET /helloworld
 module.exports.helloWorld = function(req, res) {
   res.send('Hello World!')
 }
@@ -9,7 +11,7 @@ module.exports.helloWorld = function(req, res) {
 // GET /:inputFileName/byTime?startTimestamp=***&endTimestamp=***
 module.exports.clipByTime = function(req, res, err) {
 
-  console.log("GET /:inputFileName/byTime?startTimestamp=***&endTimestamp=***");
+  logger.info("GET /:inputFileName/byTime?startTimestamp=***&endTimestamp=***");
 
   var inputFileName = req.params.inputFileName;
   var startTimestamp = req.query.startTimestamp ? req.query.startTimestamp : '00:00:03';
@@ -23,10 +25,10 @@ module.exports.clipByTime = function(req, res, err) {
   // if file exists ?
   // if startTimestamp > video.length ?
 
-  console.log("inputFileName: " + inputFileName);
-  console.log("startTimestamp: " + startTimestamp);
-  console.log("endTimestamp: " + endTimestamp);
-  console.log("duration: " + duration);
+  logger.info("inputFileName: " + inputFileName);
+  logger.info("startTimestamp: " + startTimestamp);
+  logger.info("endTimestamp: " + endTimestamp);
+  logger.info("duration: " + duration);
 
   //TODO format the name of output file
   var str = startTimestamp.split(':')[0] + startTimestamp.split(':')[1] + startTimestamp.split(':')[2];
@@ -42,17 +44,17 @@ module.exports.clipByTime = function(req, res, err) {
     .setDuration(duration)
     // .size('256x240')
     .on('progress', function(info) {
-      console.log('progress ' + info.percent.toFixed(2) + '%');
+      logger.info('progress ' + info.percent.toFixed(2) + '%');
     })
     .on('error', function(err) {
-      console.error('An error occurred: ' + err.message);
+      logger.error('An error occurred: ' + err.message);
       res.status(500);
       res.json({
         message: err.message,
       }); // res.json end
     })
     .on('end', function() {
-      console.log('Processing finished !');
+      logger.info('Processing finished !');
       res.status(200);
       res.json({
         message: 'Processing finished !',
@@ -66,14 +68,14 @@ module.exports.clipByTime = function(req, res, err) {
 // GET /:inputFileName/byFrames?startFrame=***&endFrame=***
 module.exports.clipByFrames = function(req, res, err) {
 
-  console.log("GET /:inputFileName/byFrames?startFrame=***&endFrame=***");
+  logger.info("GET /:inputFileName/byFrames?startFrame=***&endFrame=***");
 
   var inputFileName = req.params.inputFileName;
   var startFrame = req.query.startFrame;
   var endFrame = req.query.endFrame;
 
-  console.log("startFrame: " + startFrame);
-  console.log("endFrame: " + endFrame);
+  logger.info("startFrame: " + startFrame);
+  logger.info("endFrame: " + endFrame);
 
   //TODO validations
   // if file exists ?
@@ -83,17 +85,17 @@ module.exports.clipByFrames = function(req, res, err) {
 
   // STEP 1. get frame rate from metadata of origin video using ffprobe
   ffmpeg.ffprobe(path.resolve(process.env.VIDEO_INPUT_PATH, inputFileName), function(err, metadata) {
-    if (err) console.log(err);
+    if (err) logger.error(err);
     var videoStreamObj = metadata.streams[0].codec_type === "video" ? metadata.streams[0] : metadata.streams[1];
     var originRFrameRateStr = videoStreamObj.r_frame_rate;
     var originRFrameRate = originRFrameRateStr.split('/')[0] / originRFrameRateStr.split('/')[1];
     var originAvgFrameRateStr = videoStreamObj.avg_frame_rate;
     var originAvgFrameRate =  originAvgFrameRateStr.split('/')[0] / originAvgFrameRateStr.split('/')[1];
     var originFrames = videoStreamObj.nb_frames;
-    // console.log(metadata);
-    console.log("r_frame_rate: " + originRFrameRateStr + " => " + originRFrameRate);
-    console.log("avg_frame_rate: " + originAvgFrameRateStr + " => " + originAvgFrameRate);
-    console.log("nb_frames: " + originFrames);
+    // logger.info(metadata);
+    logger.info("r_frame_rate: " + originRFrameRateStr + " => " + originRFrameRate);
+    logger.info("avg_frame_rate: " + originAvgFrameRateStr + " => " + originAvgFrameRate);
+    logger.info("nb_frames: " + originFrames);
 
     // TODO validations
     // if (startFrame, endFrame) is out of the range of nb_frames ?
@@ -101,8 +103,8 @@ module.exports.clipByFrames = function(req, res, err) {
     var startTimestamp = startFrame / originAvgFrameRate;
     var duration = (endFrame - startFrame)  / originAvgFrameRate;
 
-    console.log("startTimestamp: " + startTimestamp);
-    console.log("duration: " + duration);
+    logger.info("startTimestamp: " + startTimestamp);
+    logger.info("duration: " + duration);
 
     // STEP 2. get video clip by startTimestamp and duration using ffmpeg
     ffmpeg(path.resolve(process.env.VIDEO_INPUT_PATH, inputFileName))
@@ -110,17 +112,17 @@ module.exports.clipByFrames = function(req, res, err) {
       .setStartTime(startTimestamp)
       .setDuration(duration)
       .on('progress', function(info) {
-        console.log('progress ' + info.percent.toFixed(2) + '%' + ', ' + 'processed frames: ' + info.frames);
+        logger.info('progress ' + info.percent.toFixed(2) + '%' + ', ' + 'processed frames: ' + info.frames);
       })
       .on('error', function(err) {
-        console.error('An error occurred: ' + err.message);
+        logger.error('An error occurred: ' + err.message);
         res.status(500);
         res.json({
           message: err.message,
         }); // res.json end
       })
       .on('end', function(stdout, stderr) {
-        console.log('Processing finished !');
+        logger.info('Processing finished !');
         res.status(200);
         res.json({
           message: 'Processing finished !',
@@ -136,22 +138,22 @@ module.exports.clipByFrames = function(req, res, err) {
 // GET /:inputFileName/frames
 module.exports.getFrames = function(req, res, err) {
 
-  console.log("GET /:inputFileName/byFrames?startFrame=***&endFrame=***");
+  logger.info("GET /:inputFileName/byFrames?startFrame=***&endFrame=***");
 
   var inputFileName = req.params.inputFileName;
 
   ffmpeg.ffprobe(path.resolve(process.env.VIDEO_INPUT_PATH, inputFileName), function(err, metadata) {
-    if (err) console.log(err);
+    if (err) logger.error(err);
     var videoStreamObj = metadata.streams[0].codec_type === "video" ? metadata.streams[0] : metadata.streams[1];
     var originRFrameRateStr = videoStreamObj.r_frame_rate;
     var originRFrameRate = originRFrameRateStr.split('/')[0] / originRFrameRateStr.split('/')[1];
     var originAvgFrameRateStr = videoStreamObj.avg_frame_rate;
     var originAvgFrameRate =  originAvgFrameRateStr.split('/')[0] / originAvgFrameRateStr.split('/')[1];
     var originFrames = videoStreamObj.nb_frames;
-    console.log(metadata);
-    console.log("r_frame_rate: " + originRFrameRateStr + " => " + originRFrameRate);
-    console.log("avg_frame_rate: " + originAvgFrameRateStr + " => " + originAvgFrameRate);
-    console.log("nb_frames: " + originFrames);
+    logger.info(metadata);
+    logger.info("r_frame_rate: " + originRFrameRateStr + " => " + originRFrameRate);
+    logger.info("avg_frame_rate: " + originAvgFrameRateStr + " => " + originAvgFrameRate);
+    logger.info("nb_frames: " + originFrames);
     res.status(200).json({
       "nb_frames" : originFrames
     }); // res.json end
@@ -161,7 +163,7 @@ module.exports.getFrames = function(req, res, err) {
 // GET /:fileName/select
 module.exports.initSelectPage = function(req, res, err) {
 
-  console.log("GET /:fileName/select");
+  logger.info("GET /:fileName/select");
 
   var fileName = req.params.fileName;
   res.sendFile(path.resolve(__dirname + '/../public/select_highlights_type.html'));
@@ -170,7 +172,7 @@ module.exports.initSelectPage = function(req, res, err) {
 // GET /:fileName/highlights?highlightsType=***
 module.exports.getHighlightsFromVideo =  function(req, res, err) {
 
-  console.log("GET /:fileName/highlights?highlightsType=***");
+  logger.info("GET /:fileName/highlights?highlightsType=***");
 
   var fileName = req.params.fileName;
   var highlightsType = req.query.highlightsType;
@@ -195,9 +197,9 @@ module.exports.getHighlightsFromVideo =  function(req, res, err) {
 
 function mockupImageIdentificationService(fileName, highlightsType){
 
-  console.log("mockupImageIdentificationService is processing video: ");
-  console.log("filename: " + fileName);
-  console.log("highlightsType: " + highlightsType);
+  logger.info("mockupImageIdentificationService is processing video: ");
+  logger.info("filename: " + fileName);
+  logger.info("highlightsType: " + highlightsType);
 
   var framesArray = ["5-25", "50-59", "100-200"];
   return framesArray;
@@ -205,11 +207,11 @@ function mockupImageIdentificationService(fileName, highlightsType){
 
 function getClipByFrames(inputFileName, startFrame, endFrame) {
 
-  console.log("getClipByFrames:");
+  logger.info("getClipByFrames:");
 
-  console.log("inputFileName: " + inputFileName);
-  console.log("startFrame: " + startFrame);
-  console.log("endFrame: " + endFrame);
+  logger.info("inputFileName: " + inputFileName);
+  logger.info("startFrame: " + startFrame);
+  logger.info("endFrame: " + endFrame);
 
   var mark = inputFileName + "-" + "from" + startFrame + "to" + endFrame;
 
@@ -221,23 +223,23 @@ function getClipByFrames(inputFileName, startFrame, endFrame) {
 
   // STEP 1. get frame rate from metadata of origin video using ffprobe
   ffmpeg.ffprobe(path.resolve(process.env.FILE_UPLOAD_PATH, inputFileName), function(err, metadata) {
-    if (err) console.log(err);
+    if (err) logger.error(err);
     var videoStreamObj = metadata.streams[0].codec_type === "video" ? metadata.streams[0] : metadata.streams[1];
     var originRFrameRateStr = videoStreamObj.r_frame_rate;
     var originRFrameRate = originRFrameRateStr.split('/')[0] / originRFrameRateStr.split('/')[1];
     var originAvgFrameRateStr = videoStreamObj.avg_frame_rate;
     var originAvgFrameRate =  originAvgFrameRateStr.split('/')[0] / originAvgFrameRateStr.split('/')[1];
     var originFrames = videoStreamObj.nb_frames;
-    // console.log(metadata);
-    console.log("r_frame_rate: " + originRFrameRateStr + " => " + originRFrameRate);
-    console.log("avg_frame_rate: " + originAvgFrameRateStr + " => " + originAvgFrameRate);
-    console.log("nb_frames: " + originFrames);
+    // logger.info(metadata);
+    logger.info("r_frame_rate: " + originRFrameRateStr + " => " + originRFrameRate);
+    logger.info("avg_frame_rate: " + originAvgFrameRateStr + " => " + originAvgFrameRate);
+    logger.info("nb_frames: " + originFrames);
 
     var startTimestamp = startFrame / originAvgFrameRate;
     var duration = (endFrame - startFrame)  / originAvgFrameRate;
 
-    console.log("startTimestamp: " + startTimestamp);
-    console.log("duration: " + duration);
+    logger.info("startTimestamp: " + startTimestamp);
+    logger.info("duration: " + duration);
 
     // STEP 2. get video clip by startTimestamp and duration using ffmpeg
     ffmpeg(path.resolve(process.env.FILE_UPLOAD_PATH, inputFileName))
@@ -245,17 +247,17 @@ function getClipByFrames(inputFileName, startFrame, endFrame) {
       .setStartTime(startTimestamp)
       .setDuration(duration)
       .on('progress', function(info) {
-        console.log(mark + ' ' + 'progress ' + info.percent.toFixed(2) + '%' + ', ' + 'processed frames: ' + info.frames);
+        logger.info(mark + ' ' + 'progress ' + info.percent.toFixed(2) + '%' + ', ' + 'processed frames: ' + info.frames);
       })
       .on('error', function(err) {
-        console.error(mark + ' ' + 'An error occurred: ' + err.message);
+        logger.error(mark + ' ' + 'An error occurred: ' + err.message);
         // res.status(500);
         // res.json({
         //   message: err.message,
         // }); // res.json end
       })
       .on('end', function(stdout, stderr) {
-        console.log(mark + ' ' + 'Processing finished !');
+        logger.info(mark + ' ' + 'Processing finished !');
         // res.status(200);
         // res.json({
         //   message: 'Processing finished !',

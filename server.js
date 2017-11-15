@@ -3,6 +3,11 @@ const app =  express();
 const multer  = require('multer');
 const includeMulter = multer().any();
 require('./util/readenv').config();
+var log4js = require('log4js');
+
+//config log4j
+log4js.configure(__dirname+"/config/log4js.json", { reloadSecs: 300 });
+app.use(log4js.connectLogger(log4js.getLogger('access'), { level: log4js.levels.INFO }));
 
 // app.use(multer().any());
 function shouldParseRequest(req) {

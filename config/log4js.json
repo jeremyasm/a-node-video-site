@@ -1,0 +1,23 @@
+{
+    "appenders": [{
+      "type": "dateFile",
+      "filename": "../logs/access.log",
+      "pattern": "-yyyy-MM-dd.log",
+      "alwaysIncludePattern": true,
+      "category": "access"
+    }, {
+      "type": "console"
+    }, {
+      "type": "dateFile",
+      "filename": "../logs/app.log",
+      "pattern": "-yyyy-MM-dd.log",
+      "alwaysIncludePattern": true,
+      "category": "app"
+    }],
+    "replaceConsole":true,
+    "levels":{
+      "access": "info",
+      "app": "info"
+    }
+  }
+  
